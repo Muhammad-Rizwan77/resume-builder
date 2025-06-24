@@ -1,0 +1,135 @@
+<div class="resume-preview">
+    <!-- Header Section -->
+    <div class="resume-header">
+        <h1>{{resumeData.personalInfo.fullName || 'Your Name'}}</h1>
+        <div class="contact-info">
+            <span ng-show="resumeData.personalInfo.email">
+                <i class="fas fa-envelope"></i> {{resumeData.personalInfo.email}}
+            </span>
+            <span ng-show="resumeData.personalInfo.phone" class="ms-3">
+                <i class="fas fa-phone"></i> {{resumeData.personalInfo.phone}}
+            </span>
+            <br ng-show="resumeData.personalInfo.email || resumeData.personalInfo.phone">
+            <span ng-show="resumeData.personalInfo.address">
+                <i class="fas fa-map-marker-alt"></i> {{resumeData.personalInfo.address}}
+            </span>
+            <span ng-show="resumeData.personalInfo.linkedin" class="ms-3">
+                <i class="fab fa-linkedin"></i> {{resumeData.personalInfo.linkedin}}
+            </span>
+            <span ng-show="resumeData.personalInfo.website" class="ms-3">
+                <i class="fas fa-globe"></i> {{resumeData.personalInfo.website}}
+            </span>
+        </div>
+    </div>
+
+    <!-- Education Section -->
+    <div class="resume-section" ng-show="resumeData.education.length > 0">
+        <h3>Education</h3>
+        <div ng-repeat="education in resumeData.education" class="resume-item">
+            <h4>{{education.degree}}</h4>
+            <div class="meta">
+                {{education.institution}}
+                <span ng-show="education.location"> • {{education.location}}</span>
+                <span ng-show="education.graduationYear"> • {{education.graduationYear}}</span>
+                <span ng-show="education.gpa"> • GPA: {{education.gpa}}</span>
+            </div>
+            <div ng-show="education.coursework" class="description">
+                <strong>Relevant Coursework:</strong> {{education.coursework}}
+            </div>
+            <div ng-show="education.honors" class="description">
+                <strong>Honors & Awards:</strong> {{education.honors}}
+            </div>
+        </div>
+    </div>
+
+    <!-- Experience Section -->
+    <div class="resume-section" ng-show="resumeData.experience.length > 0">
+        <h3>Professional Experience</h3>
+        <div ng-repeat="experience in resumeData.experience" class="resume-item">
+            <h4>{{experience.jobTitle}}</h4>
+            <div class="meta">
+                {{experience.company}}
+                <span ng-show="experience.location"> • {{experience.location}}</span>
+                <span ng-show="experience.startDate"> • {{formatDate(experience.startDate)}} - 
+                    <span ng-show="experience.isCurrent">Present</span>
+                    <span ng-show="!experience.isCurrent && experience.endDate">{{formatDate(experience.endDate)}}</span>
+                </span>
+            </div>
+            <div ng-show="experience.description" class="description" ng-bind-html="formatDescription(experience.description)"></div>
+            <div ng-show="experience.technologies" class="description">
+                <strong>Technologies:</strong> {{experience.technologies}}
+            </div>
+        </div>
+    </div>
+
+    <!-- Projects Section -->
+    <div class="resume-section" ng-show="resumeData.projects.length > 0">
+        <h3>Projects</h3>
+        <div ng-repeat="project in resumeData.projects" class="resume-item">
+            <h4>
+                {{project.title}}
+                <span ng-show="project.url" class="ms-2">
+                    <a href="{{project.url}}" target="_blank" style="font-size: 0.9rem; color: #007bff;">
+                        <i class="fas fa-external-link-alt"></i>
+                    </a>
+                </span>
+            </h4>
+            <div class="meta">
+                <span ng-show="project.type">{{project.type}}</span>
+                <span ng-show="project.date"> • {{formatDate(project.date)}}</span>
+                <span ng-show="project.role"> • {{project.role}}</span>
+                <span ng-show="project.teamSize"> • Team of {{project.teamSize}}</span>
+            </div>
+            <div ng-show="project.description" class="description" ng-bind-html="formatDescription(project.description)"></div>
+            <div ng-show="project.technologies" class="description">
+                <strong>Technologies:</strong> {{project.technologies}}
+            </div>
+            <div ng-show="project.achievements" class="description" ng-bind-html="formatDescription(project.achievements)"></div>
+            <div ng-show="project.repository" class="description">
+                <strong>Repository:</strong> 
+                <a href="{{project.repository}}" target="_blank" style="color: #007bff;">
+                    {{project.repository}}
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Skills Section -->
+    <div class="resume-section" ng-show="resumeData.skills.length > 0 || resumeData.skillCategories.technical || resumeData.skillCategories.soft || resumeData.skillCategories.languages || resumeData.skillCategories.certifications">
+        <h3>Skills</h3>
+
+        <!-- Individual Skills -->
+        <div ng-show="resumeData.skills.length > 0" class="skills-list mb-3">
+            <span ng-repeat="skill in resumeData.skills" class="skill-item">{{skill}}</span>
+        </div>
+
+        <!-- Categorized Skills -->
+        <div ng-show="resumeData.skillCategories.technical" class="resume-item">
+            <h4>Technical Skills</h4>
+            <div class="description">{{resumeData.skillCategories.technical}}</div>
+        </div>
+
+        <div ng-show="resumeData.skillCategories.soft" class="resume-item">
+            <h4>Soft Skills</h4>
+            <div class="description">{{resumeData.skillCategories.soft}}</div>
+        </div>
+
+        <div ng-show="resumeData.skillCategories.languages" class="resume-item">
+            <h4>Languages</h4>
+            <div class="description">{{resumeData.skillCategories.languages}}</div>
+        </div>
+
+        <div ng-show="resumeData.skillCategories.certifications" class="resume-item">
+            <h4>Certifications</h4>
+            <div class="description">{{resumeData.skillCategories.certifications}}</div>
+        </div>
+    </div>
+
+    <!-- Empty State -->
+    <div ng-show="!resumeData.personalInfo.fullName && resumeData.education.length === 0 && resumeData.experience.length === 0 && resumeData.skills.length === 0 && resumeData.projects.length === 0" 
+         class="text-center text-muted py-5">
+        <i class="fas fa-file-alt fa-4x mb-3"></i>
+        <h4>Your Resume Preview</h4>
+        <p>Start filling out the form to see your resume come to life!</p>
+    </div>
+</div>

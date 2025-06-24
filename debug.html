@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="resumeBuilderApp">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resume Builder Debug</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <!-- Custom CSS -->
+    <link href="css/styles.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container-fluid" ng-controller="MainController">
+        <h1>Resume Builder Debug</h1>
+        
+        <!-- Debug Info -->
+        <div class="alert alert-info">
+            <h4>Debug Information</h4>
+            <p><strong>Active View:</strong> {{activeView}}</p>
+            <p><strong>Is Loading:</strong> {{isLoading}}</p>
+            <p><strong>Resume Data Keys:</strong> {{Object.keys(resumeData).join(', ')}}</p>
+            <p><strong>Personal Info Name:</strong> {{resumeData.personalInfo.fullName}}</p>
+            <p><strong>Skills Count:</strong> {{resumeData.skills.length}}</p>
+            <p><strong>Education Count:</strong> {{resumeData.education.length}}</p>
+            <p><strong>Experience Count:</strong> {{resumeData.experience.length}}</p>
+            <p><strong>Projects Count:</strong> {{resumeData.projects.length}}</p>
+        </div>
+        
+        <!-- Test Buttons -->
+        <div class="mb-3">
+            <button class="btn btn-primary me-2" ng-click="loadSampleData()">Load Sample Data</button>
+            <button class="btn btn-secondary me-2" ng-click="setActiveView('form')">Form View</button>
+            <button class="btn btn-secondary me-2" ng-click="setActiveView('preview')">Preview View</button>
+            <button class="btn btn-success me-2" ng-click="downloadPDF()">Download PDF</button>
+            <button class="btn btn-danger" ng-click="clearAllData()">Clear All</button>
+        </div>
+        
+        <!-- Simple Form Test -->
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h5>Simple Form Test</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label class="form-label">Full Name</label>
+                            <input type="text" class="form-control" ng-model="resumeData.personalInfo.fullName" placeholder="Enter your name">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Email</label>
+                            <input type="email" class="form-control" ng-model="resumeData.personalInfo.email" placeholder="Enter your email">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Add Skill</label>
+                            <div class="input-group">
+                                <input type="text" class="form-control" ng-model="newSkill" placeholder="Enter a skill">
+                                <button class="btn btn-outline-secondary" ng-click="addSkillTest()">Add</button>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <strong>Skills:</strong>
+                            <span ng-repeat="skill in resumeData.skills" class="badge bg-primary me-1">{{skill}}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h5>Preview Test</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="resume-preview">
+                            <h3>{{resumeData.personalInfo.fullName || 'Your Name'}}</h3>
+                            <p ng-show="resumeData.personalInfo.email">Email: {{resumeData.personalInfo.email}}</p>
+                            <div ng-show="resumeData.skills.length > 0">
+                                <h5>Skills</h5>
+                                <ul>
+                                    <li ng-repeat="skill in resumeData.skills">{{skill}}</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Raw Data Display -->
+        <div class="mt-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5>Raw Resume Data</h5>
+                </div>
+                <div class="card-body">
+                    <pre>{{resumeData | json}}</pre>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.7.9/angular.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    
+    <!-- Custom JavaScript -->
+    <script src="js/app.js"></script>
+    <script src="js/controllers/main-controller.js"></script>
+    <script src="js/services/resume-service.js"></script>
+    <script src="js/services/validation-service.js"></script>
+    
+    <script>
+        // Add debug controller
+        angular.module('resumeBuilderApp').controller('MainController', function($scope, $window, $sce, ResumeService) {
+            // Add Object to scope for debugging
+            $scope.Object = Object;
+            
+            // Add test function for skills
+            $scope.addSkillTest = function() {
+                if ($scope.newSkill && $scope.newSkill.trim()) {
+                    if (!$scope.resumeData.skills) {
+                        $scope.resumeData.skills = [];
+                    }
+                    if ($scope.resumeData.skills.indexOf($scope.newSkill.trim()) === -1) {
+                        $scope.resumeData.skills.push($scope.newSkill.trim());
+                        $scope.newSkill = '';
+                    }
+                }
+            };
+            
+            // Initialize
+            $scope.activeView = 'form';
+            $scope.isLoading = false;
+            $scope.newSkill = '';
+            
+            // Load data
+            try {
+                $scope.resumeData = ResumeService.getResumeData();
+                console.log('Debug: Resume data loaded', $scope.resumeData);
+            } catch (error) {
+                console.error('Debug: Error loading data', error);
+                $scope.resumeData = {
+                    personalInfo: { fullName: '', email: '', phone: '', address: '', linkedin: '', website: '' },
+                    education: [],
+                    experience: [],
+                    skills: [],
+                    projects: [],
+                    skillCategories: { technical: '', soft: '', languages: '', certifications: '' }
+                };
+            }
+            
+            // Basic functions
+            $scope.setActiveView = function(view) { $scope.activeView = view; };
+            $scope.saveData = function() { ResumeService.saveResumeData($scope.resumeData); };
+            $scope.clearAllData = function() {
+                if (confirm('Clear all data?')) {
+                    ResumeService.clearAllData();
+                    $scope.resumeData = {
+                        personalInfo: { fullName: '', email: '', phone: '', address: '', linkedin: '', website: '' },
+                        education: [],
+                        experience: [],
+                        skills: [],
+                        projects: [],
+                        skillCategories: { technical: '', soft: '', languages: '', certifications: '' }
+                    };
+                }
+            };
+            
+            $scope.loadSampleData = function() {
+                $scope.resumeData = {
+                    personalInfo: {
+                        fullName: 'John Doe',
+                        email: 'john.doe@email.com',
+                        phone: '(555) 123-4567',
+                        address: 'New York, NY',
+                        linkedin: 'https://linkedin.com/in/johndoe',
+                        website: 'https://johndoe.dev'
+                    },
+                    education: [{
+                        id: 'edu1',
+                        degree: 'Bachelor of Computer Science',
+                        institution: 'Tech University',
+                        graduationYear: '2020',
+                        gpa: '3.8',
+                        location: 'New York, NY'
+                    }],
+                    experience: [{
+                        id: 'exp1',
+                        jobTitle: 'Software Developer',
+                        company: 'Tech Corp',
+                        location: 'New York, NY',
+                        startDate: '2020-06',
+                        endDate: '',
+                        isCurrent: true,
+                        description: 'Developed web applications'
+                    }],
+                    skills: ['JavaScript', 'React', 'Node.js', 'Python'],
+                    projects: [{
+                        id: 'proj1',
+                        title: 'Portfolio Website',
+                        description: 'Built personal portfolio',
+                        technologies: 'React, CSS'
+                    }],
+                    skillCategories: {
+                        technical: 'JavaScript, React, Node.js',
+                        soft: 'Communication, Leadership',
+                        languages: 'English (Native)',
+                        certifications: 'AWS Certified'
+                    }
+                };
+                ResumeService.saveResumeData($scope.resumeData);
+            };
+            
+            $scope.downloadPDF = function() {
+                var element = document.querySelector('.resume-preview');
+                if (element && typeof html2pdf !== 'undefined') {
+                    html2pdf().from(element).save('resume.pdf');
+                } else {
+                    alert('PDF functionality not available or preview not found');
+                }
+            };
+            
+            // Watch for changes
+            $scope.$watch('resumeData', function(newVal, oldVal) {
+                if (newVal !== oldVal && newVal) {
+                    $scope.saveData();
+                }
+            }, true);
+        });
+    </script>
+</body>
+</html>

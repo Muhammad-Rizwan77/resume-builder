@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resume Builder Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .success { background-color: #d4edda; border-color: #c3e6cb; }
+        .error { background-color: #f8d7da; border-color: #f5c6cb; }
+        .info { background-color: #d1ecf1; border-color: #bee5eb; }
+    </style>
+</head>
+<body>
+    <h1>Resume Builder Application Test</h1>
+    
+    <div class="test-section info">
+        <h3>Test Instructions</h3>
+        <ol>
+            <li>Open the main application by clicking: <a href="index.html" target="_blank">Resume Builder</a></li>
+            <li>Test the following features:</li>
+            <ul>
+                <li>Load Sample Data button</li>
+                <li>Fill out personal information</li>
+                <li>Add education entries</li>
+                <li>Add work experience</li>
+                <li>Add skills (both individual and categorized)</li>
+                <li>Add projects</li>
+                <li>Switch between form and preview views</li>
+                <li>Download PDF functionality</li>
+                <li>Data persistence (refresh page and check if data is saved)</li>
+            </ul>
+        </ol>
+    </div>
+
+    <div class="test-section">
+        <h3>Expected Functionality</h3>
+        <ul>
+            <li>✅ Real-time preview updates as you type</li>
+            <li>✅ Form validation with visual feedback</li>
+            <li>✅ Data automatically saved to localStorage</li>
+            <li>✅ PDF download generates properly formatted resume</li>
+            <li>✅ Responsive design works on mobile and desktop</li>
+            <li>✅ All form inputs are properly bound with ng-model</li>
+            <li>✅ Progress indicator shows completion percentage</li>
+        </ul>
+    </div>
+
+    <div class="test-section">
+        <h3>Common Issues and Solutions</h3>
+        <ul>
+            <li><strong>PDF not downloading:</strong> Make sure html2pdf.js is loaded and you're using a modern browser</li>
+            <li><strong>Data not saving:</strong> Check browser console for localStorage errors</li>
+            <li><strong>Preview not updating:</strong> Verify AngularJS is loaded and no JavaScript errors in console</li>
+            <li><strong>Styling issues:</strong> Ensure Bootstrap CSS is loading properly</li>
+        </ul>
+    </div>
+
+    <script>
+        // Simple test to check if required libraries are available
+        window.onload = function() {
+            var testResults = document.createElement('div');
+            testResults.className = 'test-section';
+            testResults.innerHTML = '<h3>Library Check</h3>';
+            
+            var tests = [
+                { name: 'AngularJS', check: function() { return typeof angular !== 'undefined'; } },
+                { name: 'html2pdf', check: function() { return typeof html2pdf !== 'undefined'; } },
+                { name: 'Bootstrap CSS', check: function() { 
+                    var links = document.getElementsByTagName('link');
+                    for (var i = 0; i < links.length; i++) {
+                        if (links[i].href.includes('bootstrap')) return true;
+                    }
+                    return false;
+                }},
+                { name: 'Font Awesome', check: function() { 
+                    var links = document.getElementsByTagName('link');
+                    for (var i = 0; i < links.length; i++) {
+                        if (links[i].href.includes('font-awesome')) return true;
+                    }
+                    return false;
+                }}
+            ];
+            
+            tests.forEach(function(test) {
+                var result = test.check();
+                var status = result ? '✅' : '❌';
+                var color = result ? 'green' : 'red';
+                testResults.innerHTML += '<div style="color: ' + color + '">' + status + ' ' + test.name + '</div>';
+            });
+            
+            document.body.appendChild(testResults);
+        };
+    </script>
+</body>
+</html>

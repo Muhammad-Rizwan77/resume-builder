@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="testApp">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple AngularJS Test</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container mt-4" ng-controller="TestController">
+        <h1>AngularJS Test - No Routing</h1>
+        
+        <div class="alert alert-success" ng-show="!hasError">
+            ✅ AngularJS is working correctly!
+        </div>
+        
+        <div class="alert alert-danger" ng-show="hasError">
+            ❌ There are errors in the console
+        </div>
+        
+        <div class="card">
+            <div class="card-header">
+                <h5>Basic Data Binding Test</h5>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <label class="form-label">Enter your name:</label>
+                    <input type="text" class="form-control" ng-model="testData.name" placeholder="Type here...">
+                </div>
+                
+                <div class="mb-3">
+                    <label class="form-label">Add items to list:</label>
+                    <div class="input-group">
+                        <input type="text" class="form-control" ng-model="newItem" placeholder="Enter item">
+                        <button class="btn btn-primary" ng-click="addItem()">Add</button>
+                    </div>
+                </div>
+                
+                <div class="alert alert-info">
+                    <h6>Live Preview:</h6>
+                    <p><strong>Name:</strong> {{testData.name || 'Not entered yet'}}</p>
+                    <p><strong>Items:</strong></p>
+                    <ul ng-show="testData.items.length > 0">
+                        <li ng-repeat="item in testData.items">{{item}}</li>
+                    </ul>
+                    <p ng-show="testData.items.length === 0"><em>No items added yet</em></p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="mt-3">
+            <h6>Raw Data:</h6>
+            <pre>{{testData | json}}</pre>
+        </div>
+    </div>
+
+    <!-- AngularJS -->
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.7.9/angular.min.js"></script>
+    
+    <script>
+        // Simple test app without routing
+        angular.module('testApp', [])
+            .controller('TestController', function($scope) {
+                $scope.hasError = false;
+                $scope.testData = {
+                    name: '',
+                    items: []
+                };
+                $scope.newItem = '';
+                
+                $scope.addItem = function() {
+                    if ($scope.newItem && $scope.newItem.trim()) {
+                        $scope.testData.items.push($scope.newItem.trim());
+                        $scope.newItem = '';
+                    }
+                };
+                
+                // Check for errors
+                window.addEventListener('error', function() {
+                    $scope.hasError = true;
+                    $scope.$apply();
+                });
+                
+                console.log('Test app initialized successfully');
+            });
+    </script>
+</body>
+</html>

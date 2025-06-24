@@ -1,0 +1,114 @@
+<div class="form-section" ng-controller="ExperienceController">
+    <h5><i class="fas fa-briefcase me-2"></i>Work Experience</h5>
+    
+    <!-- Add Experience Button -->
+    <div class="mb-3">
+        <button type="button" class="btn btn-add-item" ng-click="addExperience()">
+            <i class="fas fa-plus me-1"></i>Add Experience
+        </button>
+    </div>
+    
+    <!-- Experience Items -->
+    <div ng-repeat="experience in resumeData.experience track by experience.id" class="dynamic-item">
+        <button type="button" class="btn btn-remove-item remove-btn" ng-click="removeExperience(experience.id)">
+            <i class="fas fa-times"></i>
+        </button>
+        
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <label class="form-label">Job Title *</label>
+                <input type="text" 
+                       class="form-control" 
+                       ng-model="experience.jobTitle"
+                       ng-class="{'is-invalid': experienceErrors[experience.id] && experienceErrors[experience.id].jobTitle}"
+                       placeholder="Software Developer"
+                       required>
+                <div class="invalid-feedback" ng-show="experienceErrors[experience.id] && experienceErrors[experience.id].jobTitle">
+                    {{experienceErrors[experience.id].jobTitle}}
+                </div>
+            </div>
+            
+            <div class="col-md-6 mb-3">
+                <label class="form-label">Company *</label>
+                <input type="text" 
+                       class="form-control" 
+                       ng-model="experience.company"
+                       ng-class="{'is-invalid': experienceErrors[experience.id] && experienceErrors[experience.id].company}"
+                       placeholder="Company Name"
+                       required>
+                <div class="invalid-feedback" ng-show="experienceErrors[experience.id] && experienceErrors[experience.id].company">
+                    {{experienceErrors[experience.id].company}}
+                </div>
+            </div>
+        </div>
+        
+        <div class="row">
+            <div class="col-md-4 mb-3">
+                <label class="form-label">Start Date *</label>
+                <input type="month" 
+                       class="form-control" 
+                       ng-model="experience.startDate"
+                       ng-class="{'is-invalid': experienceErrors[experience.id] && experienceErrors[experience.id].startDate}"
+                       required>
+                <div class="invalid-feedback" ng-show="experienceErrors[experience.id] && experienceErrors[experience.id].startDate">
+                    {{experienceErrors[experience.id].startDate}}
+                </div>
+            </div>
+            
+            <div class="col-md-4 mb-3">
+                <label class="form-label">End Date</label>
+                <input type="month" 
+                       class="form-control" 
+                       ng-model="experience.endDate"
+                       ng-class="{'is-invalid': experienceErrors[experience.id] && experienceErrors[experience.id].endDate}"
+                       ng-disabled="experience.isCurrent">
+                <div class="invalid-feedback" ng-show="experienceErrors[experience.id] && experienceErrors[experience.id].endDate">
+                    {{experienceErrors[experience.id].endDate}}
+                </div>
+            </div>
+            
+            <div class="col-md-4 mb-3 d-flex align-items-end">
+                <div class="form-check">
+                    <input class="form-check-input" 
+                           type="checkbox" 
+                           ng-model="experience.isCurrent"
+                           id="current-{{experience.id}}">
+                    <label class="form-check-label" for="current-{{experience.id}}">
+                        Current Position
+                    </label>
+                </div>
+            </div>
+        </div>
+        
+        <div class="mb-3">
+            <label class="form-label">Location</label>
+            <input type="text" 
+                   class="form-control" 
+                   ng-model="experience.location"
+                   placeholder="City, State or Remote">
+        </div>
+        
+        <div class="mb-3">
+            <label class="form-label">Job Description</label>
+            <textarea class="form-control" 
+                      ng-model="experience.description"
+                      rows="4"
+                      placeholder="• Developed and maintained web applications using React and Node.js&#10;• Collaborated with cross-functional teams to deliver high-quality software&#10;• Improved application performance by 30% through code optimization"></textarea>
+            <small class="form-text text-muted">Use bullet points (•) to list your achievements and responsibilities</small>
+        </div>
+        
+        <div class="mb-3">
+            <label class="form-label">Key Technologies</label>
+            <input type="text" 
+                   class="form-control" 
+                   ng-model="experience.technologies"
+                   placeholder="JavaScript, React, Node.js, MongoDB, AWS">
+        </div>
+    </div>
+    
+    <!-- Empty State -->
+    <div ng-show="resumeData.experience.length === 0" class="text-center text-muted py-4">
+        <i class="fas fa-briefcase fa-3x mb-3"></i>
+        <p>No work experience entries yet. Click "Add Experience" to get started.</p>
+    </div>
+</div>

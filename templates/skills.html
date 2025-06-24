@@ -1,0 +1,105 @@
+<div class="form-section" ng-controller="SkillsController">
+    <h5><i class="fas fa-cogs me-2"></i>Skills</h5>
+    
+    <!-- Add Skill Input -->
+    <div class="mb-3">
+        <div class="input-group">
+            <input type="text" 
+                   class="form-control" 
+                   ng-model="newSkill"
+                   ng-keypress="addSkillOnEnter($event)"
+                   placeholder="Enter a skill (e.g., JavaScript, Project Management)"
+                   maxlength="50">
+            <button class="btn btn-add-item" type="button" ng-click="addSkill()">
+                <i class="fas fa-plus me-1"></i>Add Skill
+            </button>
+        </div>
+        <small class="form-text text-muted">Press Enter or click "Add Skill" to add each skill</small>
+    </div>
+    
+    <!-- Skills Display -->
+    <div ng-show="resumeData.skills.length > 0" class="mb-3">
+        <div class="skills-container">
+            <span ng-repeat="skill in resumeData.skills track by $index" class="skill-tag">
+                {{skill}}
+                <span class="remove-skill" ng-click="removeSkill(skill)" title="Remove skill">
+                    ×
+                </span>
+            </span>
+        </div>
+    </div>
+    
+    <!-- Skill Categories (Optional Enhancement) -->
+    <div class="row">
+        <div class="col-md-6 mb-3">
+            <label class="form-label">Technical Skills</label>
+            <textarea class="form-control" 
+                      ng-model="skillCategories.technical"
+                      rows="3"
+                      placeholder="Programming languages, frameworks, tools, databases..."></textarea>
+            <small class="form-text text-muted">Optional: Organize your technical skills here</small>
+        </div>
+        
+        <div class="col-md-6 mb-3">
+            <label class="form-label">Soft Skills</label>
+            <textarea class="form-control" 
+                      ng-model="skillCategories.soft"
+                      rows="3"
+                      placeholder="Communication, leadership, problem-solving, teamwork..."></textarea>
+            <small class="form-text text-muted">Optional: List your soft skills here</small>
+        </div>
+    </div>
+    
+    <div class="row">
+        <div class="col-md-6 mb-3">
+            <label class="form-label">Languages</label>
+            <textarea class="form-control" 
+                      ng-model="skillCategories.languages"
+                      rows="2"
+                      placeholder="English (Native), Spanish (Fluent), French (Conversational)..."></textarea>
+            <small class="form-text text-muted">Optional: List languages and proficiency levels</small>
+        </div>
+        
+        <div class="col-md-6 mb-3">
+            <label class="form-label">Certifications</label>
+            <textarea class="form-control" 
+                      ng-model="skillCategories.certifications"
+                      rows="2"
+                      placeholder="AWS Certified Developer, PMP, Scrum Master..."></textarea>
+            <small class="form-text text-muted">Optional: List relevant certifications</small>
+        </div>
+    </div>
+    
+    <!-- Quick Add Buttons for Common Skills -->
+    <div class="mb-3">
+        <h6 class="text-muted">Quick Add Common Skills:</h6>
+        <div class="btn-group-sm" role="group">
+            <button type="button"
+                    class="btn btn-outline-secondary btn-sm me-1 mb-1"
+                    ng-repeat="commonSkill in getAvailableCommonSkills()"
+                    ng-click="addCommonSkill(commonSkill)">
+                {{commonSkill}}
+            </button>
+        </div>
+        <div class="mt-2">
+            <button type="button" class="btn btn-outline-info btn-sm me-2" ng-click="sortSkills()">
+                <i class="fas fa-sort-alpha-down me-1"></i>Sort Skills
+            </button>
+            <button type="button" class="btn btn-outline-warning btn-sm me-2" ng-click="importSkills()">
+                <i class="fas fa-upload me-1"></i>Import Skills
+            </button>
+            <button type="button" class="btn btn-outline-success btn-sm me-2" ng-click="exportSkills()">
+                <i class="fas fa-download me-1"></i>Export Skills
+            </button>
+            <button type="button" class="btn btn-outline-danger btn-sm" ng-click="clearAllSkills()">
+                <i class="fas fa-trash me-1"></i>Clear All
+            </button>
+        </div>
+    </div>
+    
+    <!-- Empty State -->
+    <div ng-show="resumeData.skills.length === 0" class="text-center text-muted py-4">
+        <i class="fas fa-cogs fa-3x mb-3"></i>
+        <p>No skills added yet. Start typing in the field above or use the quick add buttons.</p>
+    </div>
+</div>

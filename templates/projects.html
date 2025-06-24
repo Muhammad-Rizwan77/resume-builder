@@ -1,0 +1,134 @@
+<div class="form-section" ng-controller="ProjectsController">
+    <h5><i class="fas fa-project-diagram me-2"></i>Projects</h5>
+    
+    <!-- Add Project Button -->
+    <div class="mb-3">
+        <button type="button" class="btn btn-add-item" ng-click="addProject()">
+            <i class="fas fa-plus me-1"></i>Add Project
+        </button>
+    </div>
+    
+    <!-- Project Items -->
+    <div ng-repeat="project in resumeData.projects track by project.id" class="dynamic-item">
+        <button type="button" class="btn btn-remove-item remove-btn" ng-click="removeProject(project.id)">
+            <i class="fas fa-times"></i>
+        </button>
+        
+        <div class="row">
+            <div class="col-md-8 mb-3">
+                <label class="form-label">Project Title *</label>
+                <input type="text" 
+                       class="form-control" 
+                       ng-model="project.title"
+                       ng-class="{'is-invalid': projectErrors[project.id] && projectErrors[project.id].title}"
+                       placeholder="E-commerce Web Application"
+                       required>
+                <div class="invalid-feedback" ng-show="projectErrors[project.id] && projectErrors[project.id].title">
+                    {{projectErrors[project.id].title}}
+                </div>
+            </div>
+            
+            <div class="col-md-4 mb-3">
+                <label class="form-label">Project Date</label>
+                <input type="month" 
+                       class="form-control" 
+                       ng-model="project.date"
+                       placeholder="2023-06">
+            </div>
+        </div>
+        
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <label class="form-label">Project URL</label>
+                <input type="url" 
+                       class="form-control" 
+                       ng-model="project.url"
+                       ng-class="{'is-invalid': projectErrors[project.id] && projectErrors[project.id].url}"
+                       placeholder="https://github.com/username/project">
+                <div class="invalid-feedback" ng-show="projectErrors[project.id] && projectErrors[project.id].url">
+                    {{projectErrors[project.id].url}}
+                </div>
+            </div>
+            
+            <div class="col-md-6 mb-3">
+                <label class="form-label">Repository URL</label>
+                <input type="url" 
+                       class="form-control" 
+                       ng-model="project.repository"
+                       placeholder="https://github.com/username/project-repo">
+            </div>
+        </div>
+        
+        <div class="mb-3">
+            <label class="form-label">Project Description *</label>
+            <textarea class="form-control" 
+                      ng-model="project.description"
+                      ng-class="{'is-invalid': projectErrors[project.id] && projectErrors[project.id].description}"
+                      rows="4"
+                      placeholder="• Built a full-stack e-commerce application with user authentication&#10;• Implemented shopping cart functionality and payment processing&#10;• Deployed on AWS with CI/CD pipeline using GitHub Actions"
+                      required></textarea>
+            <div class="invalid-feedback" ng-show="projectErrors[project.id] && projectErrors[project.id].description">
+                {{projectErrors[project.id].description}}
+            </div>
+            <small class="form-text text-muted">Use bullet points (•) to describe key features and achievements</small>
+        </div>
+        
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <label class="form-label">Technologies Used</label>
+                <input type="text" 
+                       class="form-control" 
+                       ng-model="project.technologies"
+                       placeholder="React, Node.js, MongoDB, Express, AWS">
+                <small class="form-text text-muted">Separate technologies with commas</small>
+            </div>
+            
+            <div class="col-md-6 mb-3">
+                <label class="form-label">Project Type</label>
+                <select class="form-control" ng-model="project.type">
+                    <option value="">Select project type</option>
+                    <option value="Personal">Personal Project</option>
+                    <option value="Academic">Academic Project</option>
+                    <option value="Professional">Professional Project</option>
+                    <option value="Open Source">Open Source Contribution</option>
+                    <option value="Freelance">Freelance Project</option>
+                </select>
+            </div>
+        </div>
+        
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <label class="form-label">Team Size</label>
+                <input type="number" 
+                       class="form-control" 
+                       ng-model="project.teamSize"
+                       placeholder="1"
+                       min="1"
+                       max="50">
+            </div>
+            
+            <div class="col-md-6 mb-3">
+                <label class="form-label">Your Role</label>
+                <input type="text" 
+                       class="form-control" 
+                       ng-model="project.role"
+                       placeholder="Full-stack Developer, Team Lead, etc.">
+            </div>
+        </div>
+        
+        <div class="mb-3">
+            <label class="form-label">Key Achievements</label>
+            <textarea class="form-control" 
+                      ng-model="project.achievements"
+                      rows="2"
+                      placeholder="• Improved application performance by 40%&#10;• Gained 1000+ active users within first month"></textarea>
+            <small class="form-text text-muted">Optional: Highlight specific achievements or metrics</small>
+        </div>
+    </div>
+    
+    <!-- Empty State -->
+    <div ng-show="resumeData.projects.length === 0" class="text-center text-muted py-4">
+        <i class="fas fa-project-diagram fa-3x mb-3"></i>
+        <p>No projects added yet. Click "Add Project" to showcase your work.</p>
+    </div>
+</div>

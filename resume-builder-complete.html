@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="resumeBuilderApp">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Professional Resume Builder</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f8f9fa;
+            line-height: 1.6;
+        }
+        .navbar-brand {
+            font-weight: 600;
+            font-size: 1.5rem;
+        }
+        .form-section {
+            margin-bottom: 2rem;
+            padding: 1.5rem;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .form-section h5 {
+            color: #495057;
+            border-bottom: 2px solid #007bff;
+            padding-bottom: 0.5rem;
+            margin-bottom: 1rem;
+        }
+        .btn-add-item {
+            background-color: #28a745;
+            border-color: #28a745;
+            color: white;
+            border-radius: 20px;
+            padding: 0.375rem 1rem;
+            font-size: 0.875rem;
+        }
+        .btn-remove-item {
+            background-color: #dc3545;
+            border-color: #dc3545;
+            color: white;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .dynamic-item {
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            position: relative;
+        }
+        .dynamic-item .remove-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+        }
+        .skill-tag {
+            display: inline-block;
+            background-color: #007bff;
+            color: white;
+            padding: 0.25rem 0.75rem;
+            margin: 0.25rem;
+            border-radius: 15px;
+            font-size: 0.875rem;
+            position: relative;
+        }
+        .skill-tag .remove-skill {
+            margin-left: 0.5rem;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .resume-preview {
+            background: white;
+            padding: 2rem;
+            min-height: 800px;
+            font-family: 'Times New Roman', serif;
+            line-height: 1.4;
+            color: #333;
+        }
+        .resume-header {
+            text-align: center;
+            border-bottom: 2px solid #333;
+            padding-bottom: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        .resume-header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+            color: #2c3e50;
+            font-weight: 700;
+        }
+        .resume-section {
+            margin-bottom: 1.5rem;
+        }
+        .resume-section h3 {
+            font-size: 1.3rem;
+            color: #2c3e50;
+            border-bottom: 1px solid #bdc3c7;
+            padding-bottom: 0.3rem;
+            margin-bottom: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 600;
+        }
+        .resume-item {
+            margin-bottom: 1rem;
+            page-break-inside: avoid;
+        }
+        .resume-item h4 {
+            font-size: 1.1rem;
+            margin-bottom: 0.3rem;
+            color: #34495e;
+            font-weight: 600;
+        }
+        .resume-item .meta {
+            font-style: italic;
+            color: #7f8c8d;
+            margin-bottom: 0.5rem;
+            font-size: 0.95rem;
+        }
+        .skills-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+        .skill-item {
+            background-color: #ecf0f1;
+            padding: 0.3rem 0.8rem;
+            border-radius: 15px;
+            font-size: 0.9rem;
+            color: #2c3e50;
+            border: 1px solid #bdc3c7;
+        }
+        @media print {
+            .navbar, .card-header, .btn { display: none !important; }
+            .card { border: none !important; box-shadow: none !important; }
+            .resume-preview { padding: 0; margin: 0; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid" ng-controller="MainController">
+        <!-- Navigation -->
+        <nav class="navbar navbar-expand-lg navbar-dark bg-primary mb-4">
+            <div class="container">
+                <a class="navbar-brand" href="#">
+                    <i class="fas fa-file-alt me-2"></i>Resume Builder
+                </a>
+                <div class="navbar-nav ms-auto">
+                    <a class="nav-link" href="#" ng-click="setActiveView('form')" ng-class="{active: activeView === 'form'}">
+                        <i class="fas fa-edit me-1"></i>Edit Resume
+                    </a>
+                    <a class="nav-link" href="#" ng-click="setActiveView('preview')" ng-class="{active: activeView === 'preview'}">
+                        <i class="fas fa-eye me-1"></i>Preview
+                    </a>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Main Content -->
+        <div class="container">
+            <div class="row">
+                <!-- Form View -->
+                <div class="col-lg-6" ng-show="activeView === 'form'">
+                    <div class="card shadow-sm">
+                        <div class="card-header bg-light d-flex justify-content-between align-items-center">
+                            <h4 class="mb-0">
+                                <i class="fas fa-user-edit me-2"></i>Build Your Resume
+                            </h4>
+                            <div class="btn-group">
+                                <button class="btn btn-outline-primary btn-sm" ng-click="loadSampleData()">
+                                    <i class="fas fa-magic me-1"></i>Load Sample
+                                </button>
+                                <button class="btn btn-outline-danger btn-sm" ng-click="clearAllData()">
+                                    <i class="fas fa-trash me-1"></i>Clear All
+                                </button>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <!-- Progress Indicator -->
+                            <div class="progress mb-4" style="height: 8px;">
+                                <div class="progress-bar bg-success"
+                                     role="progressbar"
+                                     style="width: {{getCompletionPercentage()}}%">
+                                </div>
+                            </div>
+                            <div class="text-center mb-3">
+                                <small class="text-muted">Resume Completion: {{getCompletionPercentage()}}%</small>
+                            </div>
+
+                            <!-- Personal Information Section -->
+                            <div class="form-section">
+                                <h5><i class="fas fa-user me-2"></i>Personal Information</h5>
+                                
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label">Full Name *</label>
+                                        <input type="text" class="form-control" ng-model="resumeData.personalInfo.fullName" placeholder="Enter your full name" required>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label">Email Address *</label>
+                                        <input type="email" class="form-control" ng-model="resumeData.personalInfo.email" placeholder="your.email@example.com" required>
+                                    </div>
+                                </div>
+                                
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label">Phone Number *</label>
+                                        <input type="tel" class="form-control" ng-model="resumeData.personalInfo.phone" placeholder="(555) 123-4567" required>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label">Address *</label>
+                                        <input type="text" class="form-control" ng-model="resumeData.personalInfo.address" placeholder="City, State, Country" required>
+                                    </div>
+                                </div>
+                                
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label">LinkedIn Profile</label>
+                                        <input type="url" class="form-control" ng-model="resumeData.personalInfo.linkedin" placeholder="https://linkedin.com/in/yourprofile">
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label">Personal Website</label>
+                                        <input type="url" class="form-control" ng-model="resumeData.personalInfo.website" placeholder="https://yourwebsite.com">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Education Section -->
+                            <div class="form-section">
+                                <h5><i class="fas fa-graduation-cap me-2"></i>Education</h5>
+                                
+                                <div class="mb-3">
+                                    <button type="button" class="btn btn-add-item" ng-click="addEducation()">
+                                        <i class="fas fa-plus me-1"></i>Add Education
+                                    </button>
+                                </div>
+                                
+                                <div ng-repeat="education in resumeData.education track by education.id" class="dynamic-item">
+                                    <button type="button" class="btn btn-remove-item remove-btn" ng-click="removeEducation(education.id)">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                    
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3">
+                                            <label class="form-label">Degree *</label>
+                                            <input type="text" class="form-control" ng-model="education.degree" placeholder="Bachelor of Science in Computer Science" required>
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label class="form-label">Institution *</label>
+                                            <input type="text" class="form-control" ng-model="education.institution" placeholder="University Name" required>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="row">
+                                        <div class="col-md-4 mb-3">
+                                            <label class="form-label">Graduation Year *</label>
+                                            <input type="number" class="form-control" ng-model="education.graduationYear" placeholder="2023" min="1950" max="2030" required>
+                                        </div>
+                                        <div class="col-md-4 mb-3">
+                                            <label class="form-label">GPA</label>
+                                            <input type="number" class="form-control" ng-model="education.gpa" placeholder="3.8" min="0" max="4" step="0.1">
+                                        </div>
+                                        <div class="col-md-4 mb-3">
+                                            <label class="form-label">Location</label>
+                                            <input type="text" class="form-control" ng-model="education.location" placeholder="City, State">
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div ng-show="resumeData.education.length === 0" class="text-center text-muted py-4">
+                                    <i class="fas fa-graduation-cap fa-3x mb-3"></i>
+                                    <p>No education entries yet. Click "Add Education" to get started.</p>
+                                </div>
+                            </div>
+
+                            <!-- Skills Section -->
+                            <div class="form-section">
+                                <h5><i class="fas fa-cogs me-2"></i>Skills</h5>
+                                
+                                <div class="mb-3">
+                                    <div class="input-group">
+                                        <input type="text" class="form-control" ng-model="newSkill" ng-keypress="addSkillOnEnter($event)" placeholder="Enter a skill" maxlength="50">
+                                        <button class="btn btn-add-item" type="button" ng-click="addSkill()">
+                                            <i class="fas fa-plus me-1"></i>Add Skill
+                                        </button>
+                                    </div>
+                                </div>
+                                
+                                <div ng-show="resumeData.skills.length > 0" class="mb-3">
+                                    <span ng-repeat="skill in resumeData.skills track by $index" class="skill-tag">
+                                        {{skill}}
+                                        <span class="remove-skill" ng-click="removeSkill(skill)">×</span>
+                                    </span>
+                                </div>
+                                
+                                <div ng-show="resumeData.skills.length === 0" class="text-center text-muted py-4">
+                                    <i class="fas fa-cogs fa-3x mb-3"></i>
+                                    <p>No skills added yet. Start typing in the field above.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Preview View -->
+                <div class="col-lg-6" ng-show="activeView === 'preview'" ng-class="{'col-lg-12': activeView === 'preview'}">
+                    <div class="card shadow-sm">
+                        <div class="card-header bg-light d-flex justify-content-between align-items-center">
+                            <h4 class="mb-0">
+                                <i class="fas fa-file-pdf me-2"></i>Resume Preview
+                            </h4>
+                            <button class="btn btn-success" ng-click="downloadPDF()">
+                                <i class="fas fa-download me-1"></i>Download PDF
+                            </button>
+                        </div>
+                        <div class="card-body p-0">
+                            <div class="resume-preview">
+                                <!-- Header Section -->
+                                <div class="resume-header">
+                                    <h1>{{resumeData.personalInfo.fullName || 'Your Name'}}</h1>
+                                    <div class="contact-info">
+                                        <span ng-show="resumeData.personalInfo.email">
+                                            <i class="fas fa-envelope"></i> {{resumeData.personalInfo.email}}
+                                        </span>
+                                        <span ng-show="resumeData.personalInfo.phone" class="ms-3">
+                                            <i class="fas fa-phone"></i> {{resumeData.personalInfo.phone}}
+                                        </span>
+                                        <br ng-show="resumeData.personalInfo.email || resumeData.personalInfo.phone">
+                                        <span ng-show="resumeData.personalInfo.address">
+                                            <i class="fas fa-map-marker-alt"></i> {{resumeData.personalInfo.address}}
+                                        </span>
+                                        <span ng-show="resumeData.personalInfo.linkedin" class="ms-3">
+                                            <i class="fab fa-linkedin"></i> {{resumeData.personalInfo.linkedin}}
+                                        </span>
+                                        <span ng-show="resumeData.personalInfo.website" class="ms-3">
+                                            <i class="fas fa-globe"></i> {{resumeData.personalInfo.website}}
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <!-- Education Section -->
+                                <div class="resume-section" ng-show="resumeData.education.length > 0">
+                                    <h3>Education</h3>
+                                    <div ng-repeat="education in resumeData.education" class="resume-item">
+                                        <h4>{{education.degree}}</h4>
+                                        <div class="meta">
+                                            {{education.institution}}
+                                            <span ng-show="education.location"> • {{education.location}}</span>
+                                            <span ng-show="education.graduationYear"> • {{education.graduationYear}}</span>
+                                            <span ng-show="education.gpa"> • GPA: {{education.gpa}}</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Skills Section -->
+                                <div class="resume-section" ng-show="resumeData.skills.length > 0">
+                                    <h3>Skills</h3>
+                                    <div class="skills-list">
+                                        <span ng-repeat="skill in resumeData.skills" class="skill-item">{{skill}}</span>
+                                    </div>
+                                </div>
+
+                                <!-- Empty State -->
+                                <div ng-show="!resumeData.personalInfo.fullName && resumeData.education.length === 0 && resumeData.skills.length === 0" 
+                                     class="text-center text-muted py-5">
+                                    <i class="fas fa-file-alt fa-4x mb-3"></i>
+                                    <h4>Your Resume Preview</h4>
+                                    <p>Start filling out the form to see your resume come to life!</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Split View for larger screens -->
+                <div class="col-lg-6 d-none d-lg-block" ng-show="activeView === 'form'">
+                    <div class="card shadow-sm">
+                        <div class="card-header bg-light d-flex justify-content-between align-items-center">
+                            <h4 class="mb-0">
+                                <i class="fas fa-file-pdf me-2"></i>Live Preview
+                            </h4>
+                            <button class="btn btn-success" ng-click="downloadPDF()">
+                                <i class="fas fa-download me-1"></i>Download PDF
+                            </button>
+                        </div>
+                        <div class="card-body p-0">
+                            <div class="resume-preview">
+                                <!-- Same preview content as above -->
+                                <div class="resume-header">
+                                    <h1>{{resumeData.personalInfo.fullName || 'Your Name'}}</h1>
+                                    <div class="contact-info">
+                                        <span ng-show="resumeData.personalInfo.email">
+                                            <i class="fas fa-envelope"></i> {{resumeData.personalInfo.email}}
+                                        </span>
+                                        <span ng-show="resumeData.personalInfo.phone" class="ms-3">
+                                            <i class="fas fa-phone"></i> {{resumeData.personalInfo.phone}}
+                                        </span>
+                                        <br ng-show="resumeData.personalInfo.email || resumeData.personalInfo.phone">
+                                        <span ng-show="resumeData.personalInfo.address">
+                                            <i class="fas fa-map-marker-alt"></i> {{resumeData.personalInfo.address}}
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <div class="resume-section" ng-show="resumeData.education.length > 0">
+                                    <h3>Education</h3>
+                                    <div ng-repeat="education in resumeData.education" class="resume-item">
+                                        <h4>{{education.degree}}</h4>
+                                        <div class="meta">{{education.institution}} • {{education.graduationYear}}</div>
+                                    </div>
+                                </div>
+
+                                <div class="resume-section" ng-show="resumeData.skills.length > 0">
+                                    <h3>Skills</h3>
+                                    <div class="skills-list">
+                                        <span ng-repeat="skill in resumeData.skills" class="skill-item">{{skill}}</span>
+                                    </div>
+                                </div>
+
+                                <div ng-show="!resumeData.personalInfo.fullName && resumeData.education.length === 0 && resumeData.skills.length === 0" 
+                                     class="text-center text-muted py-5">
+                                    <i class="fas fa-file-alt fa-4x mb-3"></i>
+                                    <h4>Live Preview</h4>
+                                    <p>Fill out the form to see changes here!</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.7.9/angular.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+    <script>
+        // Resume Builder AngularJS Application
+        (function() {
+            'use strict';
+
+            // Main application module
+            angular.module('resumeBuilderApp', [])
+                .controller('MainController', MainController);
+
+            MainController.$inject = ['$scope', '$window'];
+
+            function MainController($scope, $window) {
+                // Initialize scope variables
+                $scope.activeView = 'form';
+                $scope.newSkill = '';
+                $scope.resumeData = {
+                    personalInfo: {
+                        fullName: '',
+                        email: '',
+                        phone: '',
+                        address: '',
+                        linkedin: '',
+                        website: ''
+                    },
+                    education: [],
+                    skills: []
+                };
+
+                // Initialize controller
+                init();
+
+                // Public methods
+                $scope.setActiveView = setActiveView;
+                $scope.downloadPDF = downloadPDF;
+                $scope.clearAllData = clearAllData;
+                $scope.loadSampleData = loadSampleData;
+                $scope.getCompletionPercentage = getCompletionPercentage;
+                $scope.addEducation = addEducation;
+                $scope.removeEducation = removeEducation;
+                $scope.addSkill = addSkill;
+                $scope.removeSkill = removeSkill;
+                $scope.addSkillOnEnter = addSkillOnEnter;
+
+                function init() {
+                    loadResumeData();
+
+                    // Watch for changes and auto-save
+                    $scope.$watch('resumeData', function(newVal, oldVal) {
+                        if (newVal !== oldVal) {
+                            saveData();
+                        }
+                    }, true);
+                }
+
+                function loadResumeData() {
+                    try {
+                        var storedData = $window.localStorage.getItem('resumeBuilderData');
+                        if (storedData) {
+                            $scope.resumeData = JSON.parse(storedData);
+                        }
+                    } catch (error) {
+                        console.error('Error loading data:', error);
+                    }
+                }
+
+                function saveData() {
+                    try {
+                        $window.localStorage.setItem('resumeBuilderData', JSON.stringify($scope.resumeData));
+                    } catch (error) {
+                        console.error('Error saving data:', error);
+                    }
+                }
+
+                function setActiveView(view) {
+                    $scope.activeView = view;
+                }
+
+                function downloadPDF() {
+                    var element = document.querySelector('.resume-preview');
+                    if (element && typeof html2pdf !== 'undefined') {
+                        var opt = {
+                            margin: 0.5,
+                            filename: ($scope.resumeData.personalInfo.fullName || 'Resume') + '.pdf',
+                            image: { type: 'jpeg', quality: 0.98 },
+                            html2canvas: { scale: 2 },
+                            jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
+                        };
+                        html2pdf().set(opt).from(element).save();
+                    } else {
+                        alert('PDF functionality not available');
+                    }
+                }
+
+                function clearAllData() {
+                    if (confirm('Are you sure you want to clear all data?')) {
+                        $scope.resumeData = {
+                            personalInfo: { fullName: '', email: '', phone: '', address: '', linkedin: '', website: '' },
+                            education: [],
+                            skills: []
+                        };
+                        $window.localStorage.removeItem('resumeBuilderData');
+                    }
+                }
+
+                function loadSampleData() {
+                    $scope.resumeData = {
+                        personalInfo: {
+                            fullName: 'John Smith',
+                            email: 'john.smith@email.com',
+                            phone: '(555) 123-4567',
+                            address: 'San Francisco, CA',
+                            linkedin: 'https://linkedin.com/in/johnsmith',
+                            website: 'https://johnsmith.dev'
+                        },
+                        education: [{
+                            id: 'edu1',
+                            degree: 'Bachelor of Science in Computer Science',
+                            institution: 'University of California, Berkeley',
+                            graduationYear: '2020',
+                            gpa: '3.8',
+                            location: 'Berkeley, CA'
+                        }],
+                        skills: ['JavaScript', 'React', 'Node.js', 'Python', 'MongoDB', 'AWS']
+                    };
+                }
+
+                function getCompletionPercentage() {
+                    var total = 6; // 4 personal info fields + education + skills
+                    var completed = 0;
+
+                    if ($scope.resumeData.personalInfo.fullName) completed++;
+                    if ($scope.resumeData.personalInfo.email) completed++;
+                    if ($scope.resumeData.personalInfo.phone) completed++;
+                    if ($scope.resumeData.personalInfo.address) completed++;
+                    if ($scope.resumeData.education.length > 0) completed++;
+                    if ($scope.resumeData.skills.length > 0) completed++;
+
+                    return Math.round((completed / total) * 100);
+                }
+
+                function addEducation() {
+                    $scope.resumeData.education.push({
+                        id: Date.now().toString(),
+                        degree: '',
+                        institution: '',
+                        graduationYear: '',
+                        gpa: '',
+                        location: ''
+                    });
+                }
+
+                function removeEducation(id) {
+                    if (confirm('Remove this education entry?')) {
+                        $scope.resumeData.education = $scope.resumeData.education.filter(function(edu) {
+                            return edu.id !== id;
+                        });
+                    }
+                }
+
+                function addSkill() {
+                    if ($scope.newSkill && $scope.newSkill.trim()) {
+                        var skill = $scope.newSkill.trim();
+                        if ($scope.resumeData.skills.indexOf(skill) === -1) {
+                            $scope.resumeData.skills.push(skill);
+                            $scope.newSkill = '';
+                        }
+                    }
+                }
+
+                function removeSkill(skill) {
+                    var index = $scope.resumeData.skills.indexOf(skill);
+                    if (index !== -1) {
+                        $scope.resumeData.skills.splice(index, 1);
+                    }
+                }
+
+                function addSkillOnEnter(event) {
+                    if (event.keyCode === 13) {
+                        event.preventDefault();
+                        addSkill();
+                    }
+                }
+            }
+        })();
+    </script>
+</body>
+</html>
